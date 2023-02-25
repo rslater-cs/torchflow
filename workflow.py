@@ -16,8 +16,8 @@ def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, m
 
             outputs = model(inputs)
 
-            loss = metrics['loss'](inputs, outputs)
-            loss.backwards()
+            loss = metrics['loss'](outputs, outputs)
+            loss.backward()
 
             optimiser.step()
 
