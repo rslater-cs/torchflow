@@ -1,11 +1,17 @@
 from torch import nn, optim, no_grad, save, load
 from torch.utils import data
 from pathlib import Path
-from copy import deepcopy
 from tqdm import tqdm
 from typing import Dict, Tuple
 
+def init_metrics(metrics: Dict[str, nn.Module]):
+    for name, metric in metrics.items():
+        metrics[name] = metric()
+
+    return metrics
+
 def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device):
+    metrics = init_metrics(metrics)
     with tqdm(data) as batches:
         for inputs, labels in batches:
             batches.set_description(f'Training: Epoch {epoch}')
@@ -16,7 +22,7 @@ def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, m
 
             outputs = model(inputs)
 
-            loss = metrics['loss'](outputs, outputs)
+            loss = metrics['loss'](outputs, labels)
             loss.backward()
 
             optimiser.step()
@@ -30,6 +36,7 @@ def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, m
     return results
 
 def validate(model: nn.Module, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device, name: str = "Validation"):
+    metrics = init_metrics(metrics)
     with no_grad:
         with tqdm(data) as batches:
             for inputs, labels in batches:
@@ -60,7 +67,6 @@ class ModelTrainer():
         self.validdata = data[1]
         self.testdata = data[2]
 
-        self.loss = metrics['loss']
         self.metrics = metrics
         self.device = device
 
