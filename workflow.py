@@ -21,8 +21,8 @@ def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, m
             optimiser.step()
 
             results = {}
-            for name, metric in metrics.items():
-                results[name] = metric(outputs, labels).item()
+            for tag, metric in metrics.items():
+                results[tag] = metric(outputs, labels).item()
 
             batches.set_postfix(results)
 
@@ -39,8 +39,8 @@ def validate(model: nn.Module, data: data.DataLoader, metrics: Dict[str, nn.Modu
                 outputs = model(inputs)
 
                 results = {}
-                for name, metric in metrics.items():
-                    results[name] = metric(outputs, labels).item()
+                for tag, metric in metrics.items():
+                    results[tag] = metric(outputs, labels).item()
 
                 batches.set_postfix(results)
 
