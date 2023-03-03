@@ -4,14 +4,7 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import Dict, Tuple
 
-def init_metrics(metrics: Dict[str, nn.Module]):
-    for name, metric in metrics.items():
-        metrics[name] = metric()
-
-    return metrics
-
 def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device):
-    metrics = init_metrics(metrics)
     with tqdm(data) as batches:
         for inputs, labels in batches:
             batches.set_description(f'Training: Epoch {epoch}')
@@ -36,7 +29,6 @@ def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, m
     return results
 
 def validate(model: nn.Module, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device, name: str = "Validation"):
-    metrics = init_metrics(metrics)
     with no_grad:
         with tqdm(data) as batches:
             for inputs, labels in batches:
@@ -67,7 +59,15 @@ class ModelTrainer():
         self.validdata = data[1]
         self.testdata = data[2]
 
-        self.metrics = metrics
+        self.train_metrics = metrics['train']
+        self.train_metrics.update(metrics['all'])
+
+        self.valid_metrics = metrics['valid']
+        self.valid_metrics.update(metrics['all'])
+
+        self.test_metrics = metrics['test']
+        self.test_metrics.update(metrics['all'])
+
         self.device = device
 
         self.save_dir = save_dir
@@ -87,8 +87,8 @@ class ModelTrainer():
             self.optimiser.load_state_dict(checkpoint_data['optim'])
 
         for epoch in range(start_epoch, self.epochs):
-            train(self.model, self.optimiser, self.traindata, self.metrics, epoch, self.device)
-            validate(self.model, self.validdata, self.metrics, epoch, self.device)
+            train(self.model, self.optimiser, self.traindata, self.train_metrics, epoch, self.device)
+            validate(self.model, self.validdata, self.valid_metrics, epoch, self.device)
 
             if self.checkpoint != False:
                 save({
@@ -97,7 +97,7 @@ class ModelTrainer():
                     'epoch':epoch
                     }, self.checkpoint)          
 
-        test(self.model, self.testdata, self.metrics, self.device)
+        test(self.model, self.testdata, self.test_metrics, self.device)
         save({
             'model':self.model.state_dict()
         }, self.save_dir / 'final_model.pt')
