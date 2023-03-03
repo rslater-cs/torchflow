@@ -71,7 +71,9 @@ class ModelTrainer():
         self.device = device
 
         self.save_dir = save_dir
-        if checkpoint:
+
+        self.checkpoint = checkpoint
+        if self.checkpoint:
             self.checkpoint = save_dir / 'checkpoint.pt'
 
         self.epochs = epochs
