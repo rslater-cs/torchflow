@@ -29,7 +29,7 @@ def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, m
     return results
 
 def validate(model: nn.Module, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device, name: str = "Validation"):
-    with no_grad:
+    with no_grad():
         with tqdm(data) as batches:
             for inputs, labels in batches:
                 batches.set_description(f'{name}: Epoch {epoch}')
