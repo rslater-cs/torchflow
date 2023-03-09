@@ -15,7 +15,9 @@ class AverageAccuracy(nn.Module):
             
         self.total_data += x.shape[0]
         x = self.softmax(x)
+        print(x.shape)
         x = argmax(x, 1)
+        print(x.shape)
         correct = (x == y).sum().item()
         self.total_correct += correct
 
