@@ -16,7 +16,6 @@ def train(closure: Callable, data: data.DataLoader, epoch):
 
     return results
 
-@overload
 def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device):
     with tqdm(data) as batches:
         for inputs, labels in batches:
