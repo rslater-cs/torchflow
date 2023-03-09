@@ -4,8 +4,7 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import Dict, Tuple, Callable, overload
 
-@overload
-def train(closure: Callable, data: data.DataLoader, epoch):
+def train_custom(closure: Callable, data: data.DataLoader, epoch):
     with tqdm(data) as batches:
         for inputs, labels in batches:
             batches.set_description(f'Training: Epoch {epoch}')
