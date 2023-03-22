@@ -2,7 +2,18 @@ from torch import nn, optim, no_grad, save, load
 from torch.utils import data
 from pathlib import Path
 from tqdm import tqdm
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Callable, overload
+
+def train_custom(closure: Callable, data: data.DataLoader, epoch):
+    with tqdm(data) as batches:
+        for inputs, labels in batches:
+            batches.set_description(f'Training: Epoch {epoch}')
+
+            results = closure(inputs, labels)
+
+            batches.set_postfix(results)
+
+    return results
 
 def train(model: nn.Module, optimiser: optim.Optimizer, data: data.DataLoader, metrics: Dict[str, nn.Module], epoch, device):
     with tqdm(data) as batches:

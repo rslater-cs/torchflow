@@ -1,4 +1,4 @@
-from torch import nn, argmax, tensor
+from torch import nn, argmax, tensor, Tensor
 
 class AverageAccuracy(nn.Module):
     def __init__(self, size):
@@ -8,10 +8,13 @@ class AverageAccuracy(nn.Module):
         self.total_correct = 0
         self.softmax = nn.Softmax(1)
 
-    def forward(self, x, y):
+    def forward(self, x, y: Tensor):
         if(self.size == self.total_data):
             self.total_correct = 0
             self.total_data = 0
+
+        if(len(y.shape) > 1 and y.shape[-1] == 1):
+            y = y.reshape(y.shape[:-1])
             
         self.total_data += x.shape[0]
         x = self.softmax(x)
